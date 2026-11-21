@@ -31,7 +31,7 @@ The API suite runs **twice**: on SQLite and on real Postgres (PGlite, the Postgr
 
 ## Not yet tested (honest gaps)
 
-- **Live Supabase project**: the schema and queries pass on Postgres locally, but haven't run against a hosted Supabase project yet. After connecting, verify the lock-out with the anon key: `curl "$SUPABASE_URL/rest/v1/lock_stories?select=*" -H "apikey: $ANON_KEY"` must return an error or `[]`.
+- **Live Supabase project (`whpevlfnkemjfetvcxrh`)**: lock-out verified on 2026-11-21. 21 tables have RLS on, 0 policies and 0 grants to `anon`/`authenticated`. With a canary story inserted, the anon key got `401 permission denied` reading `lock_stories`, `locks`, `puzzles`, `profiles` and inserting into `lock_stories`; the canary was then deleted. The security advisor shows only the expected INFO "RLS enabled, no policy". **Not yet done:** running the game server itself against the hosted database (needs `DATABASE_URL` with the database password).
 - Real Android/iOS devices and Capacitor builds (only emulated mobile viewport so far).
 - Screen-reader pass (semantic labels and `aria-live` are in place; not audited with NVDA/VoiceOver).
 - Load testing of the unlock endpoint.
