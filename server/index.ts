@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync, createReadStream } from 'node:fs';
 import { extname, join, resolve, normalize } from 'node:path';
 import { randomBytes } from 'node:crypto';
-import { openDb } from './db.ts';
+import { openDatabase } from './db.ts';
 import { createApi } from './app.ts';
 import { seedDemoLocks } from './seed.ts';
 
@@ -31,7 +31,8 @@ function getPepper(): string {
   return readFileSync(file, 'utf8').trim();
 }
 
-const db = openDb(DB_PATH);
+const db = await openDatabase(process.env);
+console.log(`[love-locks] database: ${db.dialect === 'postgres' ? 'Postgres (DATABASE_URL)' : `SQLite (${DB_PATH})`}`);
 const pepper = getPepper();
 // Hosted deployments may start from an empty disk; SEED_DEMO=1 restores the labeled demo locks.
 if (process.env.SEED_DEMO === '1') {

@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Love Locks \u00e2\u20ac\u201c The Bridge of Memories. Every Lock Holds a Story.",
+  "description": "Love Locks â€“ The Bridge of Memories. Every Lock Holds a Story.",
   "scripts": {
     "dev": "concurrently -k -n api,web -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
     "dev:web": "vite",
@@ -17,13 +17,16 @@
   },
   "dependencies": {
     "@babylonjs/core": "^7.40.0",
+    "pg": "^8.13.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "tsx": "^4.19.2"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.2.15",
     "@types/node": "^22.10.0",
+    "@types/pg": "^8.11.10",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",

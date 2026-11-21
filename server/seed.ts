@@ -3,12 +3,12 @@
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { existsSync, readFileSync } from 'node:fs';
-import { openDb, type DB } from './db.ts';
+import { openDatabase, type DB } from './db.ts';
 import { createApi } from './app.ts';
 
 /** Adds the demo locks through the real API (same validation + hashing). No-op if they exist. */
 export async function seedDemoLocks(db: DB, pepper: string): Promise<number> {
-  if ((db.prepare('SELECT count(*) AS c FROM locks WHERE is_demo = 1').get() as { c: number }).c > 0) return 0;
+  if (Number((await db.one<{ c: number }>('SELECT count(*) AS c FROM locks WHERE is_demo = 1'))?.c ?? 0) > 0) return 0;
   const api = createApi({ db, pepper });
   const server = createServer(async (req, res) => { await api(req, res); });
   await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
@@ -21,7 +21,7 @@ export async function seedDemoLocks(db: DB, pepper: string): Promise<number> {
   };
   try {
     const { token, profile } = await call('/api/auth/guest', null, {});
-    db.prepare("UPDATE profiles SET display_name = 'Love Locks Team', avatar = '🗼', is_guest = 0 WHERE id = ?").run(profile.id);
+    await db.run("UPDATE profiles SET display_name = 'Love Locks Team', avatar = '🗼', is_guest = 0 WHERE id = ?", profile.id);
     const demos = [
       {
         shape: 'heart', material: 'gold', color: '#e8c27a', engraving: 'Bienvenue', engravingStyle: 'script', decoration: 'hearts', effect: 'glow',
@@ -47,7 +47,7 @@ export async function seedDemoLocks(db: DB, pepper: string): Promise<number> {
     ];
     for (const d of demos) {
       const r = await call('/api/locks', token, { ...d, lockDate: '2026-11-21' });
-      db.prepare('UPDATE locks SET is_demo = 1 WHERE id = ?').run(r.lock.id);
+      await db.run('UPDATE locks SET is_demo = 1 WHERE id = ?', r.lock.id);
       console.log(`Seeded demo lock “${d.title}” → /lock/${r.lock.id}`);
     }
     return demos.length;
@@ -58,7 +58,7 @@ export async function seedDemoLocks(db: DB, pepper: string): Promise<number> {
 
 // CLI: npm run seed
 if (process.argv[1]?.replaceAll('\\', '/').endsWith('server/seed.ts')) {
-  const db = openDb(process.env.DB_PATH ?? 'data/lovelocks.db');
+  const db = await openDatabase(process.env);
   const pepper = process.env.SERVER_PEPPER ?? (existsSync('data/.pepper') ? readFileSync('data/.pepper', 'utf8').trim() : '');
   if (!pepper) { console.error('Start the server once (npm run dev) so data/.pepper exists, then seed.'); process.exit(1); }
   const n = await seedDemoLocks(db, pepper);

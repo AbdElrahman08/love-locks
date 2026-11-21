@@ -24,11 +24,16 @@ The repo includes a `.replit` file (Node 22, port 8787 → 80, Reserved VM deplo
 2. In **Secrets**, add `SERVER_PEPPER` (generate it with `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`). Optionally add `ADMIN_EMAILS`.
 3. Press **Run** to preview, then **Deploy → Reserved VM → Deploy**.
 
-> ⚠️ **Data persistence.** Replit deployments do not keep files across redeploys. The SQLite database (players, locks, stories) resets each time you redeploy. That's fine for a demo or closed beta, but moving to Supabase/Postgres (see below) is required before a public launch.
+> ⚠️ **Data persistence.** Replit deployments do not keep files across redeploys. **Add `DATABASE_URL` (Supabase, below) to Replit Secrets** so players and locks live in Postgres. Without it the app falls back to SQLite, which resets on every redeploy.
 
-## Supabase (target production backend)
+## Supabase (persistent production database)
 
-See CONNECTORS.md. Apply `supabase/migrations/0001_init.sql`, then point the client adapter at Supabase. The static `dist/` can then be hosted on any CDN.
+1. Create a project at supabase.com and pick a region close to your players.
+2. **Project → Connect → Session pooler** and copy the URI. Replace `[YOUR-PASSWORD]` with the database password.
+3. Set `DATABASE_URL` to that URI (in `.env` locally, or in Replit Secrets). Keep `SERVER_PEPPER` set.
+4. Start the server. It applies `supabase/migrations/0001_init.sql` (idempotent), seeds rewards and, with `SEED_DEMO=1`, the demo locks. The log shows `database: Postgres (DATABASE_URL)`.
+
+The database password is a secret: never commit it, and never use the Supabase **service-role** key in the browser. Optionally set `DATABASE_SSL_CA` to Supabase's CA certificate (Project Settings → Database → SSL) for full certificate verification.
 
 ## Mobile (Capacitor)
 

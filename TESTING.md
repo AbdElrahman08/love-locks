@@ -1,6 +1,8 @@
 # Testing
 
-## Automated (`npm test`): 22 tests, all passing (2026-11-21)
+## Automated (`npm test`): 38 tests, all passing (2026-11-21)
+
+The API suite runs **twice**: on SQLite and on real Postgres (PGlite, the Postgres engine compiled to WASM, loaded with the Supabase migration). `tests/sql.test.ts` covers the SQLite→Postgres translation.
 
 `tests/api.test.ts` starts the real HTTP API on an in-memory database with a controllable clock:
 
@@ -29,7 +31,7 @@
 
 ## Not yet tested (honest gaps)
 
-- **Supabase migration / RLS**: not applied; no project connected. Plan: `supabase db reset`, then as `anon` and as a second `authenticated` user try `select * from lock_stories`, `puzzles`, other users' `invitations`, `update locks set engraving=…` on another user's lock, and `attempt_unlock` beyond limits; all must fail.
+- **Live Supabase project**: the schema and queries pass on Postgres locally, but haven't run against a hosted Supabase project yet. After connecting, verify the lock-out with the anon key: `curl "$SUPABASE_URL/rest/v1/lock_stories?select=*" -H "apikey: $ANON_KEY"` must return an error or `[]`.
 - Real Android/iOS devices and Capacitor builds (only emulated mobile viewport so far).
 - Screen-reader pass (semantic labels and `aria-live` are in place; not audited with NVDA/VoiceOver).
 - Load testing of the unlock endpoint.

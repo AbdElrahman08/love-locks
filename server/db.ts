@@ -2,13 +2,15 @@
 // supabase/migrations/0001_init.sql so the same API contract works against both.
 import type { DatabaseSync as DatabaseSyncType } from 'node:sqlite';
 import { createRequire } from 'node:module';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { openPostgres, sqliteSql, type Sql } from './sql.ts';
 import { dirname } from 'node:path';
 import { MATERIALS, ENGRAVING_STYLES } from '../shared/catalog.ts';
 
 // Loaded via require so bundlers/test runners that don't know the newer `node:sqlite` builtin leave it alone.
 const { DatabaseSync } = createRequire(import.meta.url)('node:sqlite') as typeof import('node:sqlite');
-export type DB = DatabaseSyncType;
+export type DB = Sql;
 
 const SCHEMA = `
 PRAGMA foreign_keys = ON;
@@ -227,33 +229,48 @@ CREATE TABLE IF NOT EXISTS analytics_events (
 CREATE INDEX IF NOT EXISTS analytics_name_idx ON analytics_events(name, created_at);
 `;
 
-export function openDb(path: string): DB {
+/** Local SQLite database wrapped in the async Sql interface used by the API. */
+export function openDb(path: string): Sql {
   if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
   const db = new DatabaseSync(path);
   db.exec(SCHEMA);
   seedRewards(db);
-  return db;
+  return sqliteSql(db);
 }
 
-function seedRewards(db: DB) {
+function seedRewards(db: DatabaseSyncType) {
   const ins = db.prepare(
     'INSERT OR IGNORE INTO rewards (id, kind, ref, label, required_level, seasonal) VALUES (?, ?, ?, ?, ?, ?)',
   );
-  for (const m of MATERIALS)
-    if (m.requiredLevel > 1) ins.run(`material:${m.id}`, 'material', m.id, m.label, m.requiredLevel, m.seasonal ? 1 : 0);
-  for (const s of ENGRAVING_STYLES)
-    if (s.requiredLevel > 1) ins.run(`engraving:${s.id}`, 'engraving_style', s.id, s.label, s.requiredLevel, 0);
+  for (const r of rewardRows()) ins.run(...r);
 }
 
-/** Run fn inside a transaction (node:sqlite has no helper). */
-export function tx<T>(db: DB, fn: () => T): T {
-  db.exec('BEGIN IMMEDIATE');
-  try {
-    const r = fn();
-    db.exec('COMMIT');
-    return r;
-  } catch (e) {
-    db.exec('ROLLBACK');
-    throw e;
+/** Cosmetic rewards derived from the catalog (shared with the Postgres setup). */
+export function rewardRows(): [string, string, string, string, number, number][] {
+  const rows: [string, string, string, string, number, number][] = [];
+  for (const m of MATERIALS)
+    if (m.requiredLevel > 1) rows.push([`material:${m.id}`, 'material', m.id, m.label, m.requiredLevel, m.seasonal ? 1 : 0]);
+  for (const st of ENGRAVING_STYLES)
+    if (st.requiredLevel > 1) rows.push([`engraving:${st.id}`, 'engraving_style', st.id, st.label, st.requiredLevel, 0]);
+  return rows;
+}
+
+/** Open the right backend: Supabase/Postgres when DATABASE_URL is set, else local SQLite. */
+export async function openDatabase(env: NodeJS.ProcessEnv): Promise<Sql> {
+  if (env.DATABASE_URL) {
+    const sql = await openPostgres(env.DATABASE_URL, postgresSchema());
+    await seedRewardsSql(sql);
+    return sql;
   }
+  return openDb(env.DB_PATH ?? 'data/lovelocks.db');
+}
+
+export async function seedRewardsSql(sql: Sql) {
+  for (const r of rewardRows())
+    await sql.run('INSERT OR IGNORE INTO rewards (id, kind, ref, label, required_level, seasonal) VALUES (?, ?, ?, ?, ?, ?)', ...r);
+}
+
+/** The Supabase migration is the single source of truth for the Postgres schema. */
+export function postgresSchema(): string {
+  return readFileSync(fileURLToPath(new URL('../supabase/migrations/0001_init.sql', import.meta.url)), 'utf8');
 }

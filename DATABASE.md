@@ -2,17 +2,21 @@
 
 Two implementations of the same schema:
 
-- `server/db.ts`: SQLite (via `node:sqlite`) for local development and single-node hosting. **Implemented and tested.**
-- `supabase/migrations/0001_init.sql`: PostgreSQL with RLS and SECURITY DEFINER RPCs for production. **Written, not yet applied** (no Supabase project connected).
+- `server/db.ts`: SQLite (via `node:sqlite`). Used when `DATABASE_URL` is empty (local development).
+- `supabase/migrations/0001_init.sql`: PostgreSQL / Supabase. Used when `DATABASE_URL` is set; the server applies it on boot.
+
+Both sit behind the async `Sql` interface in `server/sql.ts`. The API writes SQLite-flavoured SQL and the Postgres adapter translates placeholders, `INSERT OR IGNORE` and aggregates, so the business logic exists once. The full API suite runs against both engines.
+
+**Access model on Supabase:** only the API server talks to the database (as `postgres`). Every table has RLS enabled with **no policies**, and `anon`/`authenticated` have no privileges, so the public Data API and anon key can read nothing. The last column below describes what the API allows; direct database access is denied to everyone except the server.
 
 ## Tables
 
-| Table | Purpose | Sensitive? | Client access (Supabase RLS) |
+| Table | Purpose | Sensitive? | What the API allows |
 |---|---|---|---|
-| `profiles` | display name, avatar, guest flag, XP, privacy toggle, admin flag | email and password hash (SQLite only; Supabase keeps auth in `auth.users`) | own row only; only cosmetic columns are updatable |
-| `sessions` | SHA-256 of bearer tokens (local backend) | yes | n/a (Supabase Auth) |
+| `profiles` | display name, avatar, guest flag, XP, privacy toggle, admin flag | email and scrypt+pepper password hash | own row only; only cosmetic columns are updatable |
+| `sessions` | SHA-256 of bearer session tokens | yes | never exposed |
 | `locks` | appearance, title, category, visibility, schedule, expiry, **slot (UNIQUE)**, status, is_demo | no | owner: all; others: live, non-private, not blocked |
-| `lock_stories` | story body + signature | **yes** | **none**, only via `attempt_unlock` / `get_story` |
+| `lock_stories` | story body + signature | **yes** | **only** after a correct answer (`/api/unlock`), or to the owner / a past solver |
 | `puzzles` | `public_config` (pin length / question), `secret_config` (hashes), hints, max attempts | **yes** | **none** |
 | `puzzle_attempts` | every attempt: lock, actor, ip hash, success, hints used | yes | none |
 | `invitations` | SHA-256(token), max uses, use count, open count, expiry, revoked | token hash | owner read; owner can set `revoked` |

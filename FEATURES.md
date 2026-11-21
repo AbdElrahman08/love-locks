@@ -41,7 +41,7 @@ Statuses: **Not started** · **In progress** · **Implemented** · **Tested** ·
 | Block creator | Tested |
 | First-party analytics funnel | Implemented |
 | PWA manifest | Implemented (no service worker yet) |
-| Supabase backend | **Blocked**: no project/connector; migration written |
+| Supabase backend (Postgres storage) | **Implemented**: tested on Postgres via PGlite; live project not yet connected |
 | Social login (Google/Apple) | **Blocked**: depends on Supabase Auth |
 | Capacitor Android/iOS builds | Not started |
 | Sentry / PostHog | Not started (hooks reserved) |

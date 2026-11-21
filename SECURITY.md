@@ -27,7 +27,8 @@
 
 ## Production hardening still to do (tracked in ROADMAP)
 
-- Move to Supabase Auth (email verification, password reset, OAuth) and apply the RLS migration; run the RLS test plan in TESTING.md.
+- Connect the live Supabase project (code ready: `DATABASE_URL`). Its Data API is locked out by RLS with no policies plus revoked privileges; verify with the anon-key check in TESTING.md.
+- Move accounts to Supabase Auth (email verification, password reset, OAuth).
 - Distributed rate limiting (the in-memory limiters are per-process; DB-backed attempt limits already work across processes).
 - Content moderation assist (keyword/ML pre-screen of titles and stories), age gate per jurisdiction, abuse reporting SLA.
 - Sentry with PII scrubbing; dependency scanning in CI.

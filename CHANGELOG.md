@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0: Supabase-ready storage (2026-11-21)
+
+- The API now runs on **Supabase Postgres** when `DATABASE_URL` is set and on local SQLite otherwise, behind one async `Sql` layer (`server/sql.ts`).
+- Rewrote `supabase/migrations/0001_init.sql` to match the server schema. It is applied idempotently on boot, with RLS on and no policies so the public Data API is locked out.
+- The test suite runs journeys A–D on both SQLite and real Postgres (PGlite): 38 tests.
+- Replit: `.replit` config, a Node 22–compatible start command, and `SEED_DEMO=1` self-seeding.
+
 ## 0.1.0: MVP (2026-11-21)
 
 ### Added
