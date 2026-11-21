@@ -5,6 +5,7 @@ import { extname, join, resolve, normalize } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { openDb } from './db.ts';
 import { createApi } from './app.ts';
+import { seedDemoLocks } from './seed.ts';
 
 loadDotEnv();
 
@@ -31,9 +32,14 @@ function getPepper(): string {
 }
 
 const db = openDb(DB_PATH);
+const pepper = getPepper();
+// Hosted deployments may start from an empty disk; SEED_DEMO=1 restores the labeled demo locks.
+if (process.env.SEED_DEMO === '1') {
+  seedDemoLocks(db, pepper).then((n) => n && console.log(`[love-locks] seeded ${n} demo locks`)).catch((e) => console.error('[love-locks] demo seed failed', e));
+}
 const api = createApi({
   db,
-  pepper: getPepper(),
+  pepper,
   adminEmails: (process.env.ADMIN_EMAILS ?? '').split(',').map((s) => s.trim()).filter(Boolean),
   trustProxy: process.env.TRUST_PROXY === '1',
 });

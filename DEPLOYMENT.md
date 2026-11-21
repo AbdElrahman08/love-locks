@@ -13,9 +13,18 @@ SERVER_PEPPER=<32+ random bytes, base64> ADMIN_EMAILS=you@example.com TRUST_PROX
 - `TRUST_PROXY=1` only behind a trusted reverse proxy (needed for per-IP limits).
 - `ADMIN_EMAILS` grants moderator access to accounts registered with those emails.
 
+- `SEED_DEMO=1` re-creates the three labeled demo locks on an empty database.
+- `npm start` runs `node --experimental-sqlite --import tsx server/index.ts`, which works on Node 22.6+ and 24.
+
 ### Replit
 
-Import the GitHub repo → Run command `npm run build && npm start` → add `SERVER_PEPPER` to Secrets → enable a persistent disk for `data/`.
+The repo includes a `.replit` file (Node 22, port 8787 → 80, Reserved VM deployment, `TRUST_PROXY=1`, `SEED_DEMO=1`).
+
+1. On replit.com, choose **Create Repl → Import from GitHub** and pick `AbdElrahman08/love-locks`.
+2. In **Secrets**, add `SERVER_PEPPER` (generate it with `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`). Optionally add `ADMIN_EMAILS`.
+3. Press **Run** to preview, then **Deploy → Reserved VM → Deploy**.
+
+> ⚠️ **Data persistence.** Replit deployments do not keep files across redeploys. The SQLite database (players, locks, stories) resets each time you redeploy. That's fine for a demo or closed beta, but moving to Supabase/Postgres (see below) is required before a public launch.
 
 ## Supabase (target production backend)
 
