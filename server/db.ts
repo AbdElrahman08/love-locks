@@ -258,6 +258,13 @@ export function rewardRows(): [string, string, string, string, number, number][]
 /** Open the right backend: Supabase/Postgres when DATABASE_URL is set, else local SQLite. */
 export async function openDatabase(env: NodeJS.ProcessEnv): Promise<Sql> {
   if (env.DATABASE_URL) {
+    if (!/^postgres(ql)?:\/\//.test(env.DATABASE_URL.trim())) {
+      // A common mix-up: pasting the Supabase *API* URL (https://<ref>.supabase.co) instead of the database URI.
+      throw new Error(
+        'DATABASE_URL must be a Postgres connection string starting with postgresql:// ' +
+        '(Supabase → Connect → Session pooler), not the https:// project API URL.',
+      );
+    }
     const sql = await openPostgres(env.DATABASE_URL, postgresSchema());
     await seedRewardsSql(sql);
     return sql;
