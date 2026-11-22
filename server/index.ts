@@ -32,11 +32,12 @@ function getPepper(): string {
 }
 
 const db = await openDatabase(process.env);
-// Show which database we connected to (host and user only, never the password) so a wrong DATABASE_URL is obvious.
+// Show which database we connected to (host and user only, never the password) so a wrong database URI is obvious.
 const dbTarget = (() => {
-  try { const u = new URL(process.env.DATABASE_URL ?? ''); return `${u.username}@${u.host}`; } catch { return 'unparseable URL'; }
+  try { const u = new URL(process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL || ''); return `${u.username}@${u.host}`; } catch { return 'unparseable URL'; }
 })();
-console.log(`[love-locks] database: ${db.dialect === 'postgres' ? `Postgres (DATABASE_URL → ${dbTarget})` : `SQLite (${DB_PATH})`}`);
+const dbVariable = process.env.SUPABASE_DATABASE_URL?.trim() ? 'SUPABASE_DATABASE_URL' : 'DATABASE_URL';
+console.log(`[love-locks] database: ${db.dialect === 'postgres' ? `Postgres (${dbVariable} at ${dbTarget})` : `SQLite (${DB_PATH})`}`);
 const pepper = getPepper();
 // Hosted deployments may start from an empty disk; SEED_DEMO=1 restores the labeled demo locks.
 if (process.env.SEED_DEMO === '1') {

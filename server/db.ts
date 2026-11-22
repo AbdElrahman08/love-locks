@@ -255,17 +255,20 @@ export function rewardRows(): [string, string, string, string, number, number][]
   return rows;
 }
 
-/** Open the right backend: Supabase/Postgres when DATABASE_URL is set, else local SQLite. */
+/** Open the right backend: prefer the explicit Supabase URI, then DATABASE_URL, else local SQLite. */
 export async function openDatabase(env: NodeJS.ProcessEnv): Promise<Sql> {
-  if (env.DATABASE_URL) {
-    if (!/^postgres(ql)?:\/\//.test(env.DATABASE_URL.trim())) {
+  // Replit can reserve DATABASE_URL for its managed database. A dedicated variable lets both
+  // connections coexist while this app intentionally uses Supabase as its persistence layer.
+  const connectionString = env.SUPABASE_DATABASE_URL?.trim() || env.DATABASE_URL?.trim();
+  if (connectionString) {
+    if (!/^postgres(ql)?:\/\//.test(connectionString)) {
       // A common mix-up: pasting the Supabase *API* URL (https://<ref>.supabase.co) instead of the database URI.
       throw new Error(
-        'DATABASE_URL must be a Postgres connection string starting with postgresql:// ' +
+        'SUPABASE_DATABASE_URL (or DATABASE_URL) must be a Postgres connection string starting with postgresql:// ' +
         '(Supabase → Connect → Session pooler), not the https:// project API URL.',
       );
     }
-    const sql = await openPostgres(env.DATABASE_URL, postgresSchema());
+    const sql = await openPostgres(connectionString, postgresSchema());
     await seedRewardsSql(sql);
     return sql;
   }

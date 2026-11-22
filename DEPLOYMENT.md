@@ -21,17 +21,17 @@ SERVER_PEPPER=<32+ random bytes, base64> ADMIN_EMAILS=you@example.com TRUST_PROX
 The repo includes a `.replit` file (Node 22, port 8787 → 80, Reserved VM deployment, `TRUST_PROXY=1`, `SEED_DEMO=1`).
 
 1. On replit.com, choose **Create Repl → Import from GitHub** and pick `AbdElrahman08/love-locks`.
-2. In **Secrets**, add `SERVER_PEPPER` (generate it with `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`). Optionally add `ADMIN_EMAILS`.
+2. In **Secrets**, add `SERVER_PEPPER` (generate it with `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`). Add the Supabase Session pooler URI as `SUPABASE_DATABASE_URL` (it can coexist with Replit's reserved `DATABASE_URL`). Optionally add `ADMIN_EMAILS`.
 3. Press **Run** to preview, then **Deploy → Reserved VM → Deploy**.
 
-> ⚠️ **Data persistence.** Replit deployments do not keep files across redeploys. **Add `DATABASE_URL` (Supabase, below) to Replit Secrets** so players and locks live in Postgres. Without it the app falls back to SQLite, which resets on every redeploy.
+> ⚠️ **Data persistence.** Replit deployments do not keep files across redeploys. **Add `SUPABASE_DATABASE_URL` (Supabase, below) to Replit Secrets** so players and locks live in Postgres. Without it the app falls back to SQLite, which resets on every redeploy.
 
 ## Supabase (persistent production database)
 
 1. Create a project at supabase.com and pick a region close to your players.
 2. **Project → Connect → Session pooler** and copy the URI. Replace `[YOUR-PASSWORD]` with the database password.
-3. Set `DATABASE_URL` to that URI (in `.env` locally, or in Replit Secrets). Keep `SERVER_PEPPER` set.
-4. Start the server. It applies `supabase/migrations/0001_init.sql` (idempotent), seeds rewards and, with `SEED_DEMO=1`, the demo locks. The log shows `database: Postgres (DATABASE_URL)`.
+3. Set `SUPABASE_DATABASE_URL` to that URI in Replit Secrets. Locally, either `SUPABASE_DATABASE_URL` or `DATABASE_URL` works. Keep `SERVER_PEPPER` set.
+4. Start the server. It applies `supabase/migrations/0001_init.sql` (idempotently), seeds rewards and, with `SEED_DEMO=1`, the demo locks. The log shows `database: Postgres (SUPABASE_DATABASE_URL at <host>)`.
 
 The database password is a secret: never commit it, and never use the Supabase **service-role** key in the browser. Optionally set `DATABASE_SSL_CA` to Supabase's CA certificate (Project Settings → Database → SSL) for full certificate verification.
 
