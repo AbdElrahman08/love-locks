@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import type { Profile } from '../../shared/types.ts';
 import { Button, Card, Field, inputCls } from '../components/ui.tsx';
 import { ApiRequestError, post } from '../lib/api.ts';
@@ -54,6 +54,11 @@ export function AuthScreen() {
           </Field>
           {msg && <p className="text-sm text-rose-300" role="alert">{msg}</p>}
           <Button type="submit" className="w-full" disabled={busy}>{busy ? 'One moment…' : mode === 'register' ? 'Create account' : 'Sign in'}</Button>
+          {mode === 'register' && (
+            <p className="text-center text-xs text-ivory/50">
+              By creating an account you agree to the <Link to="/terms" className="underline">terms</Link> and <Link to="/privacy" className="underline">privacy policy</Link>.
+            </p>
+          )}
         </form>
         {mode === 'login' && me?.profile.isGuest && me.stats.locksCreated > 0 && (
           <p className="mt-3 text-xs text-ivory/50">Note: signing in to an existing account switches away from this guest session. To keep guest locks, create a new account instead.</p>

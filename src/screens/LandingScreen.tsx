@@ -42,7 +42,9 @@ export default function LandingScreen() {
 
         <footer className="mx-auto max-w-md text-center text-xs text-ivory/50">
           A virtual bridge — please never attach physical locks to real bridges or monuments.{' '}
-          <Link to="/community" className="pointer-events-auto underline">Community guidelines</Link>
+          <Link to="/community" className="pointer-events-auto underline">Community guidelines</Link>{' · '}
+          <Link to="/privacy" className="pointer-events-auto underline">Privacy</Link>{' · '}
+          <Link to="/terms" className="pointer-events-auto underline">Terms</Link>
         </footer>
       </div>
     </main>

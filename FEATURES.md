@@ -27,6 +27,7 @@ Statuses: **Not started** · **In progress** · **Implemented** · **Tested** ·
 | Profile: stats, achievements, my locks, opened stories, settings, blocked users, delete account | Tested (view) / Implemented (rest) |
 | Moderation screen (reports, hide/restore, funnel metrics) | Implemented (API tested) |
 | Community guidelines | Implemented |
+| Privacy policy & terms of use (`/privacy`, `/terms`) | Implemented: **draft**, needs legal review and a contact email |
 | Bottom navigation (Home, Explore, Create, Challenges, Profile) | Tested |
 
 ## Systems

@@ -384,7 +384,7 @@ export default function WorkshopScreen() {
               {Object.keys(errors).length > 0 && (
                 <ul className="rounded-2xl bg-rose-500/10 p-3 text-sm text-rose-300">{Object.values(errors).map((e) => <li key={e}>{e}</li>)}</ul>
               )}
-              <p className="text-xs text-ivory/50">By publishing you agree to the <Link to="/community" className="underline">community guidelines</Link>. Never include someone else’s private information.</p>
+              <p className="text-xs text-ivory/50">By publishing you agree to the <Link to="/terms" className="underline">terms</Link> and <Link to="/community" className="underline">community guidelines</Link>. Never include someone else’s private information.</p>
             </>
           )}
 

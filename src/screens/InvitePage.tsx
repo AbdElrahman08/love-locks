@@ -80,7 +80,7 @@ export function InvitePage() {
           ) : (
             <Card className="text-left"><PuzzleSolver detail={lock} token={token} onSolved={onSolved} /></Card>
           )}
-          <p className="mt-8 text-xs text-ivory/40">No app, no account needed. <Link to="/community" className="underline">Community guidelines</Link></p>
+          <p className="mt-8 text-xs text-ivory/40">No app, no account needed. <Link to="/community" className="underline">Guidelines</Link> · <Link to="/privacy" className="underline">Privacy</Link> · <Link to="/terms" className="underline">Terms</Link></p>
         </div>
       )}
     </main>

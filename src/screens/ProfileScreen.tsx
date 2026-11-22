@@ -152,6 +152,8 @@ export function ProfileScreen() {
               <div className="flex flex-wrap gap-2">
                 {p.isGuest ? <Link to="/auth"><Button variant="ghost">Sign in / Register</Button></Link> : <Button variant="ghost" onClick={signOut}>Sign out</Button>}
                 <Link to="/community"><Button variant="quiet">Community guidelines</Button></Link>
+                <Link to="/privacy"><Button variant="quiet">Privacy</Button></Link>
+                <Link to="/terms"><Button variant="quiet">Terms</Button></Link>
                 {p.isAdmin && <Link to="/admin"><Button variant="quiet">Moderation</Button></Link>}
               </div>
               <Button variant="danger" onClick={deleteAccount}>Delete my account and data</Button>

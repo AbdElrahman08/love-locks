@@ -10,6 +10,7 @@ import { ProfileScreen } from './screens/ProfileScreen.tsx';
 import { AuthScreen } from './screens/AuthScreen.tsx';
 import { CommunityScreen } from './screens/CommunityScreen.tsx';
 import { AdminScreen } from './screens/AdminScreen.tsx';
+import { PrivacyScreen, TermsScreen } from './screens/LegalScreen.tsx';
 
 // 3D-heavy screens load Babylon on demand; the invitation page never pays that cost.
 const LandingScreen = lazy(() => import('./screens/LandingScreen.tsx'));
@@ -68,6 +69,8 @@ export function App() {
           <Route path="/profile" element={<ProfileScreen />} />
           <Route path="/auth" element={<AuthScreen />} />
           <Route path="/community" element={<CommunityScreen />} />
+          <Route path="/privacy" element={<PrivacyScreen />} />
+          <Route path="/terms" element={<TermsScreen />} />
           <Route path="/admin" element={<AdminScreen />} />
           <Route path="*" element={<div className="p-10 text-center"><p className="font-display text-3xl">This path leads into the Seine.</p><NavLink to="/bridge" className="mt-4 inline-block text-brass-300 underline">Back to the bridge</NavLink></div>} />
         </Routes>

@@ -55,4 +55,4 @@ Invitation links should stay **web** links so recipients never need the app (Uni
 - [ ] DB backups (daily) + restore drill
 - [ ] Admin account created; moderation response process defined
 - [ ] Sentry DSN configured
-- [ ] Privacy policy + terms published (guidelines page exists)
+- [ ] Privacy policy + terms reviewed: drafts exist at `/privacy` and `/terms`. Set `VITE_CONTACT_EMAIL` (a build-time variable, so add it to Replit Secrets **before** deploying), then set `LEGAL_DRAFT = false` in `src/screens/LegalScreen.tsx`
