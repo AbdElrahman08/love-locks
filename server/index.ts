@@ -88,4 +88,4 @@ const server = createServer(async (req, res) => {
   createReadStream(file).pipe(res);
 });
 
-server.listen(PORT, () => console.log(`[love-locks] API${existsSync(DIST) ? ' + web' : ''} on http://localhost:${PORT}`));
+server.listen(PORT, '0.0.0.0', () => console.log(`[love-locks] API${existsSync(DIST) ? ' + web' : ''} on http://0.0.0.0:${PORT}`));

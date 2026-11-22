@@ -23,11 +23,11 @@ The repo includes `render.yaml`, a Blueprint for one free web service in Frankfu
 1. Sign up at render.com with your GitHub account, and allow access to `AbdElrahman08/love-locks`.
 2. Go to **New → Blueprint**, pick the repo, then **Apply**.
 3. When asked, fill in:
-   - `DATABASE_URL`: the Supabase **Session pooler** URI (the server also accepts `SUPABASE_DATABASE_URL`) (`postgresql://…`, with your password; not the `https://` API URL).
+   - `SUPABASE_DATABASE_URL`: the Supabase **Session pooler** URI (`postgresql://…`, with your database password; not the `https://` API URL).
    - `VITE_CONTACT_EMAIL`: the contact address for the privacy and terms pages.
    - `ADMIN_EMAILS`: your email, for the moderation screen.
-   `SERVER_PEPPER` is generated automatically. Don't change it later.
-4. Wait for the deploy to finish. The **Logs** tab must show `database: Postgres (DATABASE_URL → postgres.whpevlfnkemjfetvcxrh@…)`.
+   `SERVER_PEPPER` is generated automatically. Keep it unchanged after deployment; changing it invalidates existing puzzle verification.
+4. Wait for the deploy to finish. The **Logs** tab must show `database: Postgres (SUPABASE_DATABASE_URL at postgres.whpevlfnkemjfetvcxrh@…)`.
 5. Your game is at `https://love-locks.onrender.com` (or a similar name). Every push to `main` redeploys automatically.
 
 On the free plan, the service sleeps after 15 minutes without visitors, so the first visit afterwards takes about a minute to wake it. Data is safe because it lives in Supabase. Upgrade to a paid instance to remove the wake-up delay.
@@ -46,7 +46,7 @@ The repo includes a `.replit` file (Node 22, port 8787 → 80, Reserved VM deplo
 
 1. Create a project at supabase.com and pick a region close to your players.
 2. **Project → Connect → Session pooler** and copy the URI. Replace `[YOUR-PASSWORD]` with the database password.
-3. Set `SUPABASE_DATABASE_URL` to that URI in Replit Secrets. Locally, either `SUPABASE_DATABASE_URL` or `DATABASE_URL` works. Keep `SERVER_PEPPER` set.
+3. Set `SUPABASE_DATABASE_URL` to that URI in your host's environment settings (Render Environment for the recommended setup). Locally, either `SUPABASE_DATABASE_URL` or `DATABASE_URL` works. Keep `SERVER_PEPPER` set.
 4. Start the server. It applies `supabase/migrations/0001_init.sql` (idempotently), seeds rewards and, with `SEED_DEMO=1`, the demo locks. The log shows `database: Postgres (SUPABASE_DATABASE_URL at <host>)`.
 
 The database password is a secret: never commit it, and never use the Supabase **service-role** key in the browser. Optionally set `DATABASE_SSL_CA` to Supabase's CA certificate (Project Settings → Database → SSL) for full certificate verification.
@@ -71,4 +71,4 @@ Invitation links should stay **web** links so recipients never need the app (Uni
 - [ ] DB backups (daily) + restore drill
 - [ ] Admin account created; moderation response process defined
 - [ ] Sentry DSN configured
-- [ ] Privacy policy + terms reviewed: drafts exist at `/privacy` and `/terms`. Set `VITE_CONTACT_EMAIL` (a build-time variable, so add it to Replit Secrets **before** deploying), then set `LEGAL_DRAFT = false` in `src/screens/LegalScreen.tsx`
+- [ ] Privacy policy + terms reviewed: drafts exist at `/privacy` and `/terms`. Set `VITE_CONTACT_EMAIL` (a build-time variable, so add it to Render environment settings **before** deploying), then set `LEGAL_DRAFT = false` in `src/screens/LegalScreen.tsx`
