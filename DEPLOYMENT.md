@@ -16,7 +16,23 @@ SERVER_PEPPER=<32+ random bytes, base64> ADMIN_EMAILS=you@example.com TRUST_PROX
 - `SEED_DEMO=1` re-creates the three labeled demo locks on an empty database.
 - `npm start` runs `node --experimental-sqlite --import tsx server/index.ts`, which works on Node 22.6+ and 24.
 
-### Replit
+### Render (recommended: free, deploys from GitHub)
+
+The repo includes `render.yaml`, a Blueprint for one free web service in Frankfurt (next to the Supabase database).
+
+1. Sign up at render.com with your GitHub account, and allow access to `AbdElrahman08/love-locks`.
+2. Go to **New → Blueprint**, pick the repo, then **Apply**.
+3. When asked, fill in:
+   - `DATABASE_URL`: the Supabase **Session pooler** URI (the server also accepts `SUPABASE_DATABASE_URL`) (`postgresql://…`, with your password; not the `https://` API URL).
+   - `VITE_CONTACT_EMAIL`: the contact address for the privacy and terms pages.
+   - `ADMIN_EMAILS`: your email, for the moderation screen.
+   `SERVER_PEPPER` is generated automatically. Don't change it later.
+4. Wait for the deploy to finish. The **Logs** tab must show `database: Postgres (DATABASE_URL → postgres.whpevlfnkemjfetvcxrh@…)`.
+5. Your game is at `https://love-locks.onrender.com` (or a similar name). Every push to `main` redeploys automatically.
+
+On the free plan, the service sleeps after 15 minutes without visitors, so the first visit afterwards takes about a minute to wake it. Data is safe because it lives in Supabase. Upgrade to a paid instance to remove the wake-up delay.
+
+### Replit (if you have a subscription)
 
 The repo includes a `.replit` file (Node 22, port 8787 → 80, Reserved VM deployment, `TRUST_PROXY=1`, `SEED_DEMO=1`).
 

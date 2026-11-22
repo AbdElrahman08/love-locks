@@ -1,0 +1,32 @@
+# Render Blueprint: one free web service (API + built web app), next to Supabase in Frankfurt.
+# Render → New → Blueprint → pick this repo. You'll be asked for the values marked `sync: false`.
+services:
+  - type: web
+    name: love-locks
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: TRUST_PROXY
+        value: "1"
+      - key: SEED_DEMO
+        value: "1"
+      # Answer-hashing pepper: generated once by Render and kept. Never change it after players create locks.
+      - key: SERVER_PEPPER
+        generateValue: true
+      # Supabase → Connect → Session pooler URI (postgresql://postgres.<ref>:<password>@...pooler.supabase.com:5432/postgres)
+      - key: DATABASE_URL
+        sync: false
+      # Shown on /privacy and /terms (read at build time).
+      - key: VITE_CONTACT_EMAIL
+        sync: false
+      # Comma-separated emails that get the moderation screen after registering.
+      - key: ADMIN_EMAILS
+        sync: false
